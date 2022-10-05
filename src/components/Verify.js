@@ -15,7 +15,7 @@ import Snackbar from '@material-ui/core/Snackbar';
 import Avatar from '@material-ui/core/Avatar';
 import Tooltip from '@material-ui/core/Tooltip';
 import Paper from '@material-ui/core/Paper';
-import { Box } from '@material-ui/core';
+import { Box, CircularProgress } from '@material-ui/core';
 import TablePagination from '@material-ui/core/TablePagination';
 import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
@@ -184,6 +184,12 @@ const useStyles = makeStyles((theme) => ({
     '&.Mui-selected span': {
       color: theme.palette.stats.green,
     },
+  },
+  spinner: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%,-50%)',
   },
 }));
 
@@ -368,118 +374,129 @@ const Verify = (props) => {
 
   const cardStyles = makeCardStyles();
 
-  const captureImageItems = captureImages
-    .concat(placeholderImages)
-    .map((capture) => {
-      return (
-        <Box key={capture.id} className={cardStyles.cardElement}>
-          <div
-            className={clsx(
-              classes.cardWrapper,
-              verifyContext.captureImagesSelected[capture.id]
-                ? classes.cardSelected
-                : undefined,
-              capture.placeholder && classes.placeholderCard
-            )}
-          >
-            <Tooltip
-              key={capture.id}
-              placement="top"
-              arrow={true}
-              interactive
-              enterDelay={500}
-              enterNextDelay={500}
-              onMouseEnter={() => setDisableHoverListener(false)}
-              disableHoverListener={disableHoverListener}
-              classes={{
-                tooltipPlacementTop: tooltipPositionStyles.tooltipTop,
-              }}
-              title={
-                <CaptureDetailTooltip
-                  capture={capture}
-                  showCaptureClick={handleShowCaptureDetail}
-                />
-              }
-            >
-              <Card
-                onClick={(e) => handleCaptureClick(e, capture.id)}
-                id={`card_${capture.id}`}
-                className={classes.card}
-                elevation={capture.placeholder ? 0 : 3}
-              >
-                <CardContent className={classes.cardContent}>
-                  <Paper className={classes.cardCheckbox} elevation={4}>
-                    {verifyContext.captureImagesSelected[capture.id] && (
-                      <CheckIcon />
-                    )}
-                  </Paper>
-                  <OptimizedImage
-                    src={capture.image_url}
-                    width={isImagesLarge ? 400 : 250}
-                    className={classes.cardMedia}
-                    alertWidth="100%"
-                    alertHeight="200%"
-                    alertPosition="absolute"
-                    alertPadding="5rem 0 0 1rem"
-                    alertTitleSize="1.6rem"
-                    alertTextSize="1rem"
-                  />
-                </CardContent>
+  const CaptureImageItems = ({ capture }) => {
+    const [isImageLoading, setImageLoading] = useState(true);
 
-                <Grid
-                  justifyContent="center"
-                  container
-                  className={classes.cardActions}
-                >
-                  <Grid item>
-                    <IconButton
-                      onClick={(e) => handleShowGrowerDetail(e, capture)}
-                      aria-label={`Grower details`}
-                      name={`Grower details`}
-                      title={`Grower details`}
-                    >
-                      <Person color="primary" />
-                    </IconButton>
-                    <IconButton
-                      onClick={(e) => handleShowCaptureDetail(e, capture)}
-                      aria-label={`Capture details`}
-                      name={`Capture details`}
-                      title={`Capture details`}
-                    >
-                      <Nature color="primary" />
-                    </IconButton>
-                    <IconButton
-                      variant="link"
-                      href={`${process.env.REACT_APP_WEBMAP_DOMAIN}/?treeid=${capture.reference_id}`}
-                      target="_blank"
-                      onClick={(e) =>
-                        handleCapturePinClick(e, capture.reference_id)
-                      }
-                      aria-label={`Capture location`}
-                      title={`Capture location`}
-                    >
-                      <LocationOn color="primary" />
-                    </IconButton>
-                    <IconButton
-                      variant="link"
-                      href={`${process.env.REACT_APP_WEBMAP_DOMAIN}/?userid=${capture.grower_account_id}`}
-                      target="_blank"
-                      onClick={(e) =>
-                        handleGrowerMapClick(e, capture.grower_account_id)
-                      }
-                      aria-label={`Grower map`}
-                      title={`Grower map`}
-                    >
-                      <Map color="primary" />
-                    </IconButton>
-                  </Grid>
+    return (
+      <Box className={cardStyles.cardElement}>
+        <div
+          className={clsx(
+            classes.cardWrapper,
+            verifyContext.captureImagesSelected[capture.id]
+              ? classes.cardSelected
+              : undefined,
+            capture.placeholder && classes.placeholderCard
+          )}
+        >
+          <Tooltip
+            key={capture.id}
+            placement="top"
+            arrow={true}
+            interactive
+            enterDelay={500}
+            enterNextDelay={500}
+            onMouseEnter={() => setDisableHoverListener(false)}
+            disableHoverListener={disableHoverListener}
+            classes={{
+              tooltipPlacementTop: tooltipPositionStyles.tooltipTop,
+            }}
+            title={
+              <CaptureDetailTooltip
+                capture={capture}
+                showCaptureClick={handleShowCaptureDetail}
+              />
+            }
+          >
+            <Card
+              onClick={(e) => handleCaptureClick(e, capture.id)}
+              id={`card_${capture.id}`}
+              className={classes.card}
+              elevation={capture.placeholder ? 0 : 3}
+            >
+              <CardContent className={classes.cardContent}>
+                <Paper className={classes.cardCheckbox} elevation={4}>
+                  {verifyContext.captureImagesSelected[capture.id] && (
+                    <CheckIcon />
+                  )}
+                </Paper>
+                {isImageLoading && (
+                  <Box className={classes.spinner}>
+                    <CircularProgress />
+                  </Box>
+                )}
+                <OptimizedImage
+                  src={capture.image_url}
+                  width={isImagesLarge ? 400 : 250}
+                  className={classes.cardMedia}
+                  alertWidth="100%"
+                  alertHeight="200%"
+                  alertPosition="absolute"
+                  alertPadding="5rem 0 0 1rem"
+                  alertTitleSize="1.6rem"
+                  alertTextSize="1rem"
+                  onImageReady={() => {
+                    console.log('IMAGE IS READY');
+                    console.log(isImageLoading);
+                    setImageLoading(false);
+                  }}
+                />
+              </CardContent>
+
+              <Grid
+                justifyContent="center"
+                container
+                className={classes.cardActions}
+              >
+                <Grid item>
+                  <IconButton
+                    onClick={(e) => handleShowGrowerDetail(e, capture)}
+                    aria-label={`Grower details`}
+                    name={`Grower details`}
+                    title={`Grower details`}
+                  >
+                    <Person color="primary" />
+                  </IconButton>
+                  <IconButton
+                    onClick={(e) => handleShowCaptureDetail(e, capture)}
+                    aria-label={`Capture details`}
+                    name={`Capture details`}
+                    title={`Capture details`}
+                  >
+                    <Nature color="primary" />
+                  </IconButton>
+                  <IconButton
+                    variant="link"
+                    href={`${process.env.REACT_APP_WEBMAP_DOMAIN}/?treeid=${capture.reference_id}`}
+                    target="_blank"
+                    onClick={(e) =>
+                      handleCapturePinClick(e, capture.reference_id)
+                    }
+                    aria-label={`Capture location`}
+                    title={`Capture location`}
+                  >
+                    <LocationOn color="primary" />
+                  </IconButton>
+                  <IconButton
+                    variant="link"
+                    href={`${process.env.REACT_APP_WEBMAP_DOMAIN}/?userid=${capture.grower_account_id}`}
+                    target="_blank"
+                    onClick={(e) =>
+                      handleGrowerMapClick(e, capture.grower_account_id)
+                    }
+                    aria-label={`Grower map`}
+                    title={`Grower map`}
+                  >
+                    <Map color="primary" />
+                  </IconButton>
                 </Grid>
-              </Card>
-            </Tooltip>
-          </div>
-        </Box>
-      );
-    });
+              </Grid>
+            </Card>
+          </Tooltip>
+        </div>
+      </Box>
+    );
+  };
+
   /*=============================================================*/
 
   function handleFilterClick() {
@@ -616,7 +633,11 @@ const Verify = (props) => {
                 }}
               >
                 <Grid container className={classes.wrapper} spacing={2}>
-                  {captureImageItems}
+                  {captureImages.concat(placeholderImages).map((capture) => {
+                    return (
+                      <CaptureImageItems key={capture.id} capture={capture} />
+                    );
+                  })}
                 </Grid>
               </Grid>
               <Grid
