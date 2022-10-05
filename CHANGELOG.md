@@ -1,3 +1,17 @@
+# [1.109.0](https://github.com/Greenstand/treetracker-admin-client/compare/v1.108.4...v1.109.0) (2022-10-04)
+
+
+### Features
+
+* duplicate capture v1: display distance between two selected captures ([#863](https://github.com/Greenstand/treetracker-admin-client/issues/863)) ([a05cdb5](https://github.com/Greenstand/treetracker-admin-client/commit/a05cdb5712e27d6d11ee3f187d061450de8bc141))
+
+## [1.108.4](https://github.com/Greenstand/treetracker-admin-client/compare/v1.108.3...v1.108.4) (2022-10-04)
+
+
+### Bug Fixes
+
+* added a spinner while the image loads up in capture page ([#877](https://github.com/Greenstand/treetracker-admin-client/issues/877)) ([3ecd687](https://github.com/Greenstand/treetracker-admin-client/commit/3ecd687e2fdf6d423cb82145e4a870a0b52c4cdc))
+
 ## [1.108.3](https://github.com/Greenstand/treetracker-admin-client/compare/v1.108.2...v1.108.3) (2022-10-02)
 
 
